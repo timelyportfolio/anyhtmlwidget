@@ -138,6 +138,7 @@ HTMLWidgets.widget({
 
     let widget;
     let model;
+    let modelResolve, modelReject;
     let cleanup;
     let ws;
 
@@ -172,6 +173,8 @@ HTMLWidgets.widget({
 
       	model = new AnyModel(x.values, x.ns_id, ws);
 
+      	modelResolve(model);
+
       	if(window && window.Shiny && window.Shiny.addCustomMessageHandler) {
       	  const eventPrefix = x.ns_id ? `${x.ns_id}-` : '';
       	  Shiny.addCustomMessageHandler(`${eventPrefix}anyhtmlwidget_on_change`, ({ key, value }) => {
@@ -201,7 +204,8 @@ HTMLWidgets.widget({
         if(widget?.resize) {
           await widget.resize({ model, el, width, height });
         }
-      }
+      },
+      model: new Promise(function(res, rej) {modelResolve = res; modelReject = rej})
     };
   }
 });
